@@ -1,0 +1,37 @@
+<div ng-controller="MoteTabCtrl">
+ <h4>Motes</h4>
+ <br/>
+ <table>
+  <tr>
+   <th>Id</th>
+   <th>Title</th>
+   <th>Device Id</th>
+   <th>Location</th>
+   <th>Sensors</th>
+  </tr>
+  <tr ng-repeat="mote in motes">
+   <td>{{mote.id}}</td>
+   <td>{{mote.title}}</td>
+   <td>{{mote.device_id}}</td>
+   <td>{{mote.location}}</td>
+   <td>
+    <div ng-repeat="sensor in mote.sensors">
+     {{(measures | filter: {id: sensor.measure_id})[0].title}}
+    </div>
+   </td>
+   <td><button type="button" ng-click="deleteMote($index)">X</button></td>
+  </tr>
+  <tr>
+   <td>{{motes[motes.length - 1].id + 1}}</td>
+   <td><input type="text" ng-model="newMote.title" /></td>
+   <td><input type="text" ng-model="newMote.device_id" /></td>
+   <td><input type="text" ng-model="newMote.location" /></td>
+   <td>
+    <div ng-repeat="measure in measures">
+     <input type="checkbox" ng-model="measure.selected" />{{measure.title}}
+    </div>
+   </td>
+   <td><button type="button" ng-click="addNewMote()">Add</button></td>
+  </tr>
+ </table> 
+</div>

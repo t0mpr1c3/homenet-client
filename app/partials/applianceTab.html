@@ -1,0 +1,32 @@
+<div ng-controller="ApplianceTabCtrl">
+ <h4>Appliances</h4>
+ <br/>
+ <table>
+  <tr>
+   <th>Id</th>
+   <th>Title</th>
+   <th>Status</th>
+   <th>Controlling Mote</th>
+   <th></th>
+  </tr>
+  <tr ng-repeat="appliance in appliances">
+   <td>{{appliance.id}}</td>
+   <td>{{appliance.title}}</td>
+   <td>
+    {{appliance.status.toLowerCase()}} <button type="button" ng-click="toggleApplianceStatus($index)"><text><-></text></button>
+   </td>
+   <td>{{(motes | filter: {id: appliance.controlling_mote_id})[0].title}}</td>
+   <td><button type="button" ng-click="deleteAppliance($index)">X</button></td>
+  </tr>
+  <tr>
+   <td>{{appliances[appliances.length - 1].id + 1}}</td>
+   <td><input type="text" ng-model="newAppliance.title"  /></td>
+   <td><input type="text" ng-model="newAppliance.status" /></td>
+   <td>
+    <select ng-model="newAppliance.controlling_mote_id" ng-options="mote.id as mote.title for mote in motes"/>
+   </td>
+   <td><button type="button" ng-click="addNewAppliance()">Add</button></td>
+  </tr>
+ </table>
+ <br/>
+</div>

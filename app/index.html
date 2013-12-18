@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang='en' ng-app='myApp'>
+ <head>
+  <meta charset='utf-8'>
+  <title>My AngularJS App</title>
+  <link rel='stylesheet' href='css/app.css'/>
+ </head>
+ <body>
+  <div ng-controller='DashboardCtrl'>
+   <h4>Status of Appliances</h4>
+   <ul>
+    <li ng-repeat="appliance in appliances">
+     {{appliance.title + ' is '}}<b>{{appliance.status}}</b>
+    </li>
+   </ul>
+   <h4>Sensor Values</h4>
+   <!-- for each mote that has at least one sensor -->
+   <ul>
+    <li ng-repeat="mote in motes | filter: {sensors: '!!'}">
+     <b>{{mote.location}}</b>
+     <div ng-repeat="sensor in mote.sensors">
+      {{(measure = (measures | filter: {id: sensor.measure_id})[0]).title + ' has value ' + sensor.value + ' ' + measure.unit + ' at timestamp ' + sensor.timestamp}}
+     </div>
+    </li>
+   </ul>
+   <!-- check boxes to select measures to display -->
+   <p>Select measures to display:</p>
+   <label ng-repeat="measure in measures">
+    <input type="checkbox" ng-model="measure.display"/> {{measure.title + ' (' + measure.unit + ')'}}
+   </label>
+   <h4>Measures</h4>
+   <ul>
+    <!-- this is not quite right because some measures will not match any sensors -->
+    <li ng-repeat="measure in measures | filter: {display: true}">
+     <b>{{measure.title}}</b> ({{measure.unit}})
+     <div ng-repeat="mote in motes">
+      <div ng-repeat="sensor in mote.sensors | filter: {measure_id: measure.id}">
+       {{'value ' + sensor.value + ' ' + measure.unit + ' in ' + mote.location + ' at timestamp ' + sensor.timestamp}}
+      </div>
+     </div>
+    </li>
+   </ul>
+  </div>
+
+  <ul class='menu'>
+   <li><a href='#/appliance'>Appliances</a></li>
+   <li><a href='#/mote'>Motes</a></li>
+   <li><a href='#/measure'>Measures</a></li>
+   <li><a href='#/controlrule'>Control Rules</a></li>
+  </ul>
+
+  <div ng-view></div>
+
+  <div>Angular seed app: v<span app-version></span></div>
+
+<!-- In production use:
+  <script src='//ajax.googleapis.com/ajax/libs/angularjs/1.0.7/angular.min.js'></script>
+  -->
+  <script src='lib/angular/angular.js'></script>
+  <script src='lib/angular/angular-route.js'></script>
+  <script src='js/app.js'></script>
+  <script src='js/services.js'></script>
+  <script src='js/controllers.js'></script>
+  <script src='js/filters.js'></script>
+  <script src='js/directives.js'></script>
+ </body>
+</html>
