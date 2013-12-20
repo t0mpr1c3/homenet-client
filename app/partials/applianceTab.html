@@ -6,7 +6,7 @@
    <th>Id</th>
    <th>Title</th>
    <th>Status</th>
-   <th>Controlling Mote</th>
+   <th>Controller</th>
    <th></th>
   </tr>
   <tr ng-repeat="appliance in appliances">
@@ -19,13 +19,20 @@
    <td><button type="button" ng-click="deleteAppliance($index)">X</button></td>
   </tr>
   <tr>
-   <td>{{appliances[appliances.length - 1].id + 1}}</td>
-   <td><input type="text" ng-model="newAppliance.title"  /></td>
-   <td><input type="text" ng-model="newAppliance.status" /></td>
-   <td>
-    <select ng-model="newAppliance.controlling_mote_id" ng-options="mote.id as mote.title for mote in motes"/>
-   </td>
-   <td><button type="button" ng-click="addNewAppliance()">Add</button></td>
+   <form name="newApplianceForm" class="app-form" novalidate>
+    <td>{{appliances[appliances.length - 1].id + 1}}</td>
+    <td>
+   <form name="newApplianceForm" class="app-form" novalidate>
+     <span ng-show="newApplianceForm.title.$dirty && newApplianceForm.title.$error.required">Required: Please enter a title for the appliance</span>
+     <input type="text" name="title" ng-model="newAppliance.title" required />
+    </td>
+    <td><input type="text" ng-model="newAppliance.status" /></td>
+    <td>
+     <span ng-show="newApplianceForm.controlling_mote_id.$dirty && newApplianceForm.controlling_mote_id.$error.required">Required: Please enter a controller for the appliance</span>
+     <select name="controlling_mote_id" ng-model="newAppliance.controlling_mote_id" ng-options="mote.id as mote.title for mote in motes" required />
+    </td>
+    <td><button type="button" ng-click="addNewAppliance()">Add</button></td>
+   </form>
   </tr>
  </table>
  <br/>

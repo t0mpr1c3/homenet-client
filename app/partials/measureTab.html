@@ -6,22 +6,33 @@
    <th>Id</th>
    <th>Title</th>
    <th>Unit</th>
-   <th>Display</th>
+   <!--th>Hysteresis</th-->
+   <!--th>Display</th-->
    <th></th>
   </tr>
   <tr ng-repeat="measure in measures">
    <td>{{measure.id}}</td>
    <td>{{measure.title}}</td>
    <td>{{measure.unit}}</td>
-   <td><input type="checkbox" ng-model="measure.display" /></td>
+   <!--td>{{measure.hysteresis}}</td-->
+   <!--td><input type="checkbox" ng-model="measure.display" /></td-->
    <td><button type="button" ng-click="deleteMeasure($index)">X</button></td>
   </tr>
   <tr>
-   <td>{{measures[measures.length - 1].id + 1}}</td>
-   <td><input type="text" ng-model="newMeasure.title" /></td>
-   <td><input type="text" ng-model="newMeasure.unit" /></td>
-   <td><input type="checkbox" ng-model="newMeasure.display" /></td>
-   <td><button type="button" ng-click="addNewMeasure()">Add</button></td>
+   <form name="newMeasureForm" class="app-form" novalidate>
+    <td>{{measures[measures.length - 1].id + 1}}</td>
+    <td>
+     <span ng-show="newMeasureForm.title.$dirty && newMeasureForm.title.$error.required">Required: Please enter a title for the measure</span>
+     <input type="text" ng-model="newMeasure.title" required />
+    </td>
+    <td>
+     <span ng-show="newMeasureForm.unit.$dirty && newMeasureForm.unit.$error.required">Required: Please enter a unit for the measure</span>
+     <input type="text" ng-model="newMeasure.unit" required />
+    </td>
+    <!--td><input type="text" ng-model="newMeasure.hysteresis" /></td-->
+    <!--td><input type="checkbox" ng-model="newMeasure.display" /></td-->
+    <td><button type="button" ng-click="addNewMeasure()">Add</button></td>
+   </form>
   </tr>
  </table>
 </div>

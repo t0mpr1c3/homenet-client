@@ -22,16 +22,24 @@
    <td><button type="button" ng-click="deleteMote($index)">X</button></td>
   </tr>
   <tr>
-   <td>{{motes[motes.length - 1].id + 1}}</td>
-   <td><input type="text" ng-model="newMote.title" /></td>
-   <td><input type="text" ng-model="newMote.device_id" /></td>
-   <td><input type="text" ng-model="newMote.location" /></td>
-   <td>
-    <div ng-repeat="measure in measures">
-     <input type="checkbox" ng-model="measure.selected" />{{measure.title}}
-    </div>
-   </td>
-   <td><button type="button" ng-click="addNewMote()">Add</button></td>
+   <form name="newMoteForm" class="app-form" novalidate>
+    <td>{{motes[motes.length - 1].id + 1}}</td>
+    <td>
+     <span ng-show="newMoteForm.title.$dirty && newMoteForm.title.$error.required">Required: Please enter a title for the mote</span>
+     <input type="text" name="title" ng-model="newMote.title" required />
+    </td>
+    <td>
+     <span ng-show="newMoteForm.device_id.$dirty && newMoteForm.device_id.$error.required">Required: Please enter a device ID for the mote</span>
+     <input type="text" name="device_id" ng-model="newMote.device_id" required />
+    </td>
+    <td><input type="text" ng-model="newMote.location" /></td>
+    <td>
+     <div ng-repeat="measure in measures">
+      <input type="checkbox" ng-model="measure.selected" />{{measure.title}}
+     </div>
+    </td>
+    <td><button type="button" ng-click="addNewMote()">Add</button></td>
+   </form>
   </tr>
  </table> 
 </div>

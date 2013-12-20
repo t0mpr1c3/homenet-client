@@ -28,3 +28,21 @@
   content: "";
   padding: 0;
 }
+ 
+.app-form .ng-dirty.ng-invalid {
+  background: 'red';
+}
+
+.app-form .ng-dirty.ng-valid {
+  background: 'lightgreen';
+}
+ 
+.th {
+  align: 'left';
+  vertical-align: 'baseline';
+}
+
+.top {
+  style: 'vertical-align: top';
+  valign: 'top';
+}
