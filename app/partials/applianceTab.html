@@ -3,36 +3,70 @@
  <br/>
  <table>
   <tr>
-   <th>Id</th>
+   <!--th>Id</th-->
    <th>Title</th>
-   <th>Status</th>
+   <th>On</th>
    <th>Controller</th>
+   <th></th>
    <th></th>
   </tr>
   <tr ng-repeat="appliance in appliances">
-   <td>{{appliance.id}}</td>
-   <td>{{appliance.title}}</td>
+{{newAppliance}}
+   <!--td>{{appliance.id}}</td-->
+   <form name="appFormWrapper" novalidate>
    <td>
-    {{appliance.status.toLowerCase()}} <button type="button" ng-click="toggleApplianceStatus($index)"><text><-></text></button>
+    <span ng-hide="appliance.edit">
+     {{appliance.title}}
+    </span>
+    <span ng-show="appliance.edit">
+     <ng-form name="$parent.appForm1" class="app-form" novalidate>
+      <input type="text" name="appTitle" ng-model="newAppliance.title" required />
+     </ng-form>
+    </span>
    </td>
-   <td>{{(motes | filter: {id: appliance.controlling_mote_id})[0].title}}</td>
-   <td><button type="button" ng-click="deleteAppliance($index)">X</button></td>
+   <td>
+    <input type="checkbox" ng-model="appliance.displayStatus" ng-change="toggleApplianceStatus($index)" ng-disabled="! appliance.editable"/>
+   </td>
+   <td>
+    <span ng-hide="appliance.edit" class="errorClass">
+     {{controllingMoteTitle($index)}}
+    </span>
+    <span ng-show="appliance.edit">
+     <ng-form name="$parent.appForm2" class="app-form" novalidate>
+      <select name="appMoteId" ng-model="newAppliance.controlling_mote_id" ng-options="mote.id as mote.title for mote in motes" ng-disabled="! appliance.editable" class="errorClass" required>
+       <option value="">Select mote</option>
+      </select>
+    </ng-form>
+    </span>
+   </td>
+   <td>
+    <button type="button" ng-click="editAppliance($index)" ng-disabled="! appliance.editable">{{appliance.edit ? 'Enter' : 'Edit'}}</button>
+   </td>
+   <td>
+    <span ng-hide="appliance.confirmDelete">
+     <button type="button" ng-click="confirmDeleteAppliance($index, true)" ng-disabled="appliance.edit || (! appliance.editable)">X</button>
+    </span>
+    <span ng-show="appliance.confirmDelete" class="center">
+     <div>
+      Delete entry
+     </div>
+     <div>
+      <button type="button" ng-click="confirmDeleteAppliance($index, false)" ng-disabled="appliance.edit">Cancel</button>
+      <button type="button" ng-click="deleteAppliance($index)" ng-disabled="appliance.edit">OK</button>
+     </div>
+    </span>
+   </td>
+  </form>
   </tr>
   <tr>
-   <form name="newApplianceForm" class="app-form" novalidate>
-    <td>{{appliances[appliances.length - 1].id + 1}}</td>
-    <td>
-   <form name="newApplianceForm" class="app-form" novalidate>
-     <span ng-show="newApplianceForm.title.$dirty && newApplianceForm.title.$error.required">Required: Please enter a title for the appliance</span>
-     <input type="text" name="title" ng-model="newAppliance.title" required />
-    </td>
-    <td><input type="text" ng-model="newAppliance.status" /></td>
-    <td>
-     <span ng-show="newApplianceForm.controlling_mote_id.$dirty && newApplianceForm.controlling_mote_id.$error.required">Required: Please enter a controller for the appliance</span>
-     <select name="controlling_mote_id" ng-model="newAppliance.controlling_mote_id" ng-options="mote.id as mote.title for mote in motes" required />
-    </td>
-    <td><button type="button" ng-click="addNewAppliance()">Add</button></td>
-   </form>
+   <td/>
+   <td/>
+   <td/>
+   <td>
+    <span ng-hide="edit">
+     <button type="button" ng-click="addNewAppliance()">New</button>
+    </span>
+   </td>
   </tr>
  </table>
  <br/>

@@ -3,7 +3,7 @@
  <br/>
  <table>
   <tr>
-   <th>Id</th>
+   <!--th>Id</th-->
    <th>Title</th>
    <th>Unit</th>
    <!--th>Hysteresis</th-->
@@ -11,7 +11,7 @@
    <th></th>
   </tr>
   <tr ng-repeat="measure in measures">
-   <td>{{measure.id}}</td>
+   <!--td>{{measure.id}}</td-->
    <td>{{measure.title}}</td>
    <td>{{measure.unit}}</td>
    <!--td>{{measure.hysteresis}}</td-->
@@ -20,7 +20,7 @@
   </tr>
   <tr>
    <form name="newMeasureForm" class="app-form" novalidate>
-    <td>{{measures[measures.length - 1].id + 1}}</td>
+    <!--td>{{measures[measures.length - 1].id + 1}}</td-->
     <td>
      <span ng-show="newMeasureForm.title.$dirty && newMeasureForm.title.$error.required">Required: Please enter a title for the measure</span>
      <input type="text" ng-model="newMeasure.title" required />

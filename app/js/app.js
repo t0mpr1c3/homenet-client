@@ -9,9 +9,9 @@ angular.module('myApp', [
   'myApp.controllers'
 ]).
 config(['$routeProvider', function($routeProvider) {
-  $routeProvider.when('/appliance', {templateUrl: 'partials/applianceTab.html', controller: 'ApplianceTabCtrl'});
-  $routeProvider.when('/mote', {templateUrl: 'partials/moteTab.html', controller: 'MoteTabCtrl'});
-  $routeProvider.when('/measure', {templateUrl: 'partials/measureTab.html', controller: 'MeasureTabCtrl'});
-  $routeProvider.when('/controlrule', {templateUrl: 'partials/controlRuleTab.html', controller: 'ControlRuleTabCtrl'});
-  $routeProvider.otherwise({redirectTo: '/appliance'});
+  $routeProvider.when('/appliances', {templateUrl: 'partials/applianceTab.html', controller: 'ApplianceTabCtrl'});
+  $routeProvider.when('/motes', {templateUrl: 'partials/moteTab.html', controller: 'MoteTabCtrl'});
+  $routeProvider.when('/measures', {templateUrl: 'partials/measureTab.html', controller: 'MeasureTabCtrl'});
+  $routeProvider.when('/windows', {templateUrl: 'partials/windowTab.html', controller: 'WindowTabCtrl'});
+  $routeProvider.otherwise({redirectTo: '/appliances'});
 }]);

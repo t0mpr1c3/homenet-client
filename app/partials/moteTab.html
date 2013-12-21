@@ -3,14 +3,14 @@
  <br/>
  <table>
   <tr>
-   <th>Id</th>
+   <!--th>Id</th-->
    <th>Title</th>
    <th>Device Id</th>
    <th>Location</th>
    <th>Sensors</th>
   </tr>
   <tr ng-repeat="mote in motes">
-   <td>{{mote.id}}</td>
+   <!--td>{{mote.id}}</td-->
    <td>{{mote.title}}</td>
    <td>{{mote.device_id}}</td>
    <td>{{mote.location}}</td>
@@ -23,7 +23,7 @@
   </tr>
   <tr>
    <form name="newMoteForm" class="app-form" novalidate>
-    <td>{{motes[motes.length - 1].id + 1}}</td>
+    <!--td>{{motes[motes.length - 1].id + 1}}</td-->
     <td>
      <span ng-show="newMoteForm.title.$dirty && newMoteForm.title.$error.required">Required: Please enter a title for the mote</span>
      <input type="text" name="title" ng-model="newMote.title" required />

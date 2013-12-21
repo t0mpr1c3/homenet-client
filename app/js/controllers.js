@@ -26,39 +26,126 @@ angular.module('myApp.controllers', []).
   }]).
 
   controller('ApplianceTabCtrl', ['$scope', '$http', 'APIGetService', 'APIPostService',
-  'APIPutService', 'APIDeleteService', 'toggleFilter', function($scope, $http,
-  APIGetService, APIPostService, APIPutService, APIDeleteService, toggleFilter) {
+  'APIPutService', 'APIDeleteService', function($scope, $http,
+  APIGetService, APIPostService, APIPutService, APIDeleteService) {
     // get appliances
     $scope.appliances = [];
     APIGetService('appliances').then(function(data) {
       $scope.appliances = data;
+      for (var i = 0; i < $scope.appliances.length; i++) {
+        $scope.appliances[i].edit = false;
+        $scope.appliances[i].editable = true;
+        $scope.appliances[i].confirmDelete = false;
+        $scope.appliances[i].displayStatus = $scope.appliances[i].status;
+      }
     });
-    $scope.newAppliance = {};
+    $scope.newAppliance = {
+      'status': false
+    };
+    $scope.controllingMoteTitle = function(index) {
+      for (var i = 0; i < $scope.motes.length; i++) {
+        if ($scope.motes[i].id === $scope.appliances[index].controlling_mote_id) {
+          return $scope.motes[i].title;
+        }
+      }
+    }
     // get motes
     $scope.motes = [];
     APIGetService('motes').then(function(data) {
       $scope.motes = data;
     });
     // ng-click subroutines
-    $scope.toggleApplianceStatus = function(index) {
-      var newStatus = toggleFilter($scope.appliances[index].status);
-      APIPutService('appliances/' + $scope.appliances[index].id, {"status": newStatus}).
-        then(function() {
-          $scope.appliances[index].status = newStatus;
+    $scope.editAppliance = function(index) {
+      // prevents input errors
+      // setting forms dirty aims to highlight entry errors via css
+      var invalid = false;
+      if ($scope.appliances[index].edit && $scope.appForm1.appTitle.$invalid) { 
+        $scope.appForm1.$dirty = true;
+        $scope.appForm1.appTitle.$dirty = true;
+        invalid = true;
+      }
+      if ($scope.appliances[index].edit && $scope.appForm2.appMoteId.$invalid) { 
+        $scope.appForm2.$dirty = true;
+        $scope.appForm2.appMoteId.$dirty = true;
+        invalid = true;
+      }
+      if (invalid) {
+        return;
+      }
+      // toggle edit status and button disable
+      for (var i = 0; i < $scope.appliances.length; i++) {
+        if ( i !== index ) {
+          $scope.appliances[i].editable ^= true;
+        }
+      }
+      $scope.appliances[index].edit ^= true;
+      $scope.edit = $scope.appliances[index].edit;
+      if ($scope.appliances[index].edit)
+      {
+        $scope.newAppliance = {
+          'id': $scope.appliances[index].id,
+          'title': $scope.appliances[index].title,
+          'status': $scope.appliances[index].status,
+          'controlling_mote_id': $scope.appliances[index].controlling_mote_id
+        };
+      } else {
+        APIPutService('appliances/' + $scope.appliances[index].id, $scope.newAppliance).
+          then(function() {
+            $scope.appliances[index].title = $scope.newAppliance.title;
+            $scope.appliances[index].status = $scope.newAppliance.status;
+            $scope.appliances[index].controlling_mote_id = $scope.newAppliance.controlling_mote_id;
+            $scope.appForm1.appTitle.$dirty = false;
+            $scope.appForm2.appMoteId.$dirty = false;
         });
+      }
+    }
+    $scope.toggleApplianceStatus = function(index) {
+      if ($scope.appliances[index].edit) {
+        $scope.newAppliance.status ^= true;
+        return;
+      }
+        $scope.newAppliance = {
+          'id': $scope.appliances[index].id,
+          'title': $scope.appliances[index].title,
+          'status': $scope.appliances[index].status ^ true,
+          'controlling_mote_id': $scope.appliances[index].controlling_mote_id
+        };
+      APIPutService('appliances/' + $scope.appliances[index].id, 
+        $scope.newAppliance).
+          then(function() {
+            $scope.appliances[index].status ^= true;
+          });
+    }
+    $scope.addNewAppliance = function() {
+      $scope.newAppliance = {
+        'id': $scope.appliances[$scope.appliances.length - 1].id + 1
+      };
+      APIPostService('appliances', $scope.newAppliance).
+        then(function() {
+          $scope.appliances.push({
+            'id': $scope.appliances[$scope.appliances.length - 1].id + 1,
+            'status': false
+          });
+          $scope.newAppliance = {
+            'status': false,
+            'edit': false
+          };
+          $scope.appliances[$scope.appliances.length - 1].editable = true;
+          $scope.editAppliance($scope.appliances.length - 1);
+        });
+    }
+    $scope.confirmDeleteAppliance = function(index, val) {
+      $scope.edit = val;
+      for (var i = 0; i < $scope.appliances.length; i++) {
+        $scope.appliances[i].editable = ! val;
+      }
+      $scope.appliances[index].confirmDelete = val;
     }
     $scope.deleteAppliance = function(index) {
       APIDeleteService('appliances/' + $scope.appliances[index].id).then(function() {
+        $scope.confirmDeleteAppliance(index, false);
         $scope.appliances.splice(index, 1);
       });
-    }
-    $scope.addNewAppliance = function() {
-      $scope.newAppliance.id = $scope.appliances[$scope.appliances.length - 1].id + 1;
-      APIPostService('appliances', $scope.newAppliance).
-        then(function() {
-          $scope.appliances.push($scope.newAppliance);
-          $scope.newAppliance = {};
-        });
     }
   }]).
 
@@ -142,7 +229,7 @@ angular.module('myApp.controllers', []).
     }
   }]).
 
-  controller('ControlRuleTabCtrl', ['$scope', 'APIGetService', 'APIPostService',
+  controller('WindowTabCtrl', ['$scope', 'APIGetService', 'APIPostService',
   'APIPutService', 'APIDeleteService', function($scope, APIGetService, APIPostService,
   APIPutService, APIDeleteService) {
 /*
@@ -161,25 +248,14 @@ angular.module('myApp.controllers', []).
     $scope.windows = [];
     APIGetService('windows').then(function(data) {
       $scope.windows = data;
+      for (var i = 0; i < $scope.windows.length; i++) {
+        $scope.windows[i].edit = false;
+        $scope.windows[i].editable = true;
+        //$scope.windows[i].confirmDelete = false;
+      }
     });
-    // submit window form
-    $scope.windows = [{
-        'id': 0, 'title': 'weekday morning', 'days': 31, 'start': 18000000,
-        'end': 30600000, 'duration': 0, 'deadTime': 0 
-      }, {
-        'id': 1, 'title': 'weekday evening', 'days': 31, 'start': 61200000,
-        'end': 79200000, 'duration': 0, 'deadTime': 0    
-      }, {
-        'id': 2, 'title': 'weekend morning', 'days': 96, 'start': 21600000,
-        'end': 36000000, 'duration': 3600000, 'deadTime': 0    
-      }, {
-        'id': 3, 'title': 'weekend evening', 'days': 96, 'start': 57600000,
-        'end': 79200000, 'duration': 1000, 'deadTime': 60000   
-    }];
-    for (var i = 0; t < $scope.windows.length; i++) {
-      $scope.windows[i].edit = false;
-      $scope.windows[i].editable = true;
-    }
+    // initialize scope object
+    $scope.editWindow = {};
     $scope.day_names = [
       "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"
     ];
@@ -190,8 +266,8 @@ angular.module('myApp.controllers', []).
     $scope.minutes = ['00','15','30','45'];
     $scope.durationOptions = ['until reset','time limited'];
     $scope.durations = [1,2,5,10,15,30,60];
-    $scope.deadTimes = [0,1,2,5,10,15,30,60];
     //$scope.hourDurations = [1,2,3,6,12,24];
+    $scope.deadTimes = [0,1,2,5,10,15,30,60];
     $scope.timescales = [ 
       { "short": 's', "singular": 'sec', "plural": 'sec'},
       { "short": 'm', "singular": 'min', "plural": 'min'}
@@ -214,7 +290,6 @@ angular.module('myApp.controllers', []).
           selected_days.push($scope.day_names[i]);
         }
       }
-      // FIXME check input values
       // run length encoding of days on/off
       var val = days[0];
       var len = 1;
@@ -343,8 +418,8 @@ angular.module('myApp.controllers', []).
         $scope.editWindow.edit = false;
         // capture input
         var newWindow = {
-          'id': $scope.window[index].id,
-          'limit': $scope.editWindow.limit, 
+          'id': $scope.windows[index].id,
+          'title': $scope.editWindow.title, 
           'days': $scope.logical2binary($scope.editWindow.days),
           'start': (Number($scope.editWindow.startHour) * 60 + Number($scope.editWindow.startMinute)) * 60000,
           'end': (Number($scope.editWindow.endHour) * 60 + Number($scope.editWindow.endMinute)) * 60000,
@@ -355,32 +430,34 @@ angular.module('myApp.controllers', []).
         APIPutService('windows/' + $scope.windows[index].id, newWindow).
         then(function() {
           $scope.windows[index] = newWindow;
+          $scope.windows[index].editable = true;
+          $scope.windows[index].edit = false;
         });
       }
     }
     $scope.confirmDeleteWindow = function(index, val) {
-      $scope.windows[index].confirmDelete = val;
       $scope.editWindow.edit = val;
       for (var i = 0; i < $scope.windows.length; i++) {
         $scope.windows[i].editable = ! val;
       }
+      $scope.windows[index].confirmDelete = val;
     }
     $scope.deleteWindow = function(index) {
-      $scope.confirmDeleteWindow($index, false);
+      $scope.confirmDeleteWindow(index, false);
       APIDeleteService('windows/' + $scope.windows[index].id).then(function() {
         $scope.windows.splice(index, 1);
       });
     }
     $scope.addWindow = function() {
       var newWindow = {
-        'id': $scope.windows[$scope.windows.length - 1].id + 1, 
-        'title': '', 'edit': false, 'editable': true, 
+        'id': $scope.windows[$scope.windows.length - 1].id + 1, 'title': '', 
         'days': 0, 'start': 0, 'end': 0, 'duration': 0, 'deadTime': 0
       };
       APIPostService('windows', newWindow).
         then(function() {
           $scope.windows.push(newWindow);
+          $scope.windows[$scope.windows.length - 1].editable = true;
+          $scope.editWindowInPlace($scope.windows.length - 1);
         });
-      $scope.editWindowInPlace($scope.windows.length - 1);
     }
   }]);

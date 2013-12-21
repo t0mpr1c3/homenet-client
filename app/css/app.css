@@ -29,20 +29,40 @@
   padding: 0;
 }
  
-.app-form .ng-dirty.ng-invalid {
-  background: 'red';
+.app-form form.submitted > .ng-pristine, .ng-dirty.ng-invalid,
+          ng-dirty.ng-error.required {
+  border-color: red;
 }
 
 .app-form .ng-dirty.ng-valid {
-  background: 'lightgreen';
-}
- 
-.th {
-  align: 'left';
-  vertical-align: 'baseline';
 }
 
-.top {
-  style: 'vertical-align: top';
-  valign: 'top';
+.error {
+  color: red
+}
+
+body {
+  margin: 0px;
+  padding: 0px;
+}
+
+table {
+  border-spacing: 10px;
+  border-collapse: separate;
+}
+
+td {
+  padding: 5px;
+  text-align: left;
+  vertical-align: baseline;
+}
+ 
+th {
+  padding: 5px;
+  text-align: left;
+  vertical-align: bottom;
+}
+
+.center {
+  text-align: center;
 }

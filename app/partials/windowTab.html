@@ -1,46 +1,40 @@
-<html lang='en' ng-app='myApp'> <head>
- <meta charset='utf-8'>
- <title>My AngularJS App</title>
- <link rel='stylesheet' href='css/app.css'/>
-</head>
-<body>
- <div ng-controller="ControlRuleTabCtrl">
- <!-- 
-  Control rules are derived from simple forms that define
-  * Time constraints
-  * Sensor thresholds (with implied hysteresis, strong defaults)
-  Rules applied in simple logical combinations
-  Save/Load rule sets
+<div ng-controller="WindowTabCtrl">
+<!-- 
+ Control rules are derived from simple forms that define
+ * Time constraints
+ * Sensor thresholds (with implied hysteresis, strong defaults)
+ Rules applied in simple logical combinations
+ Save/Load rule sets
 
-  Time Constraints
-  * [Choose clock]
-  * [Force refresh of clock (cron job updates clock daily)]
-  * Choose day range
-  * Choose time window
-  * Duration of signal, or until reset
-  * Dead time after end of signal during which signal cannot be repeated
+ Time Constraints
+ * [Choose clock]
+ * [Force refresh of clock (cron job updates clock daily)]
+ * Choose day range
+ * Choose time window
+ * Duration of signal, or until reset
+ * Dead time after end of signal during which signal cannot be repeated
 
-  To do:
-  * Allow entries to be edited in place
+ To do:
+ * Allow entries to be edited in place
 
- -->
-  <h4>Time Windows</h4>
-  <table cellpadding='5'>
-   <tr>
-    <!--th align='left' style='vertical-align: bottom'>Id</th-->
-    <th align='left' style='vertical-align: bottom'>Description</th>
-    <th align='left' style='vertical-align: bottom'>Days</th>
-    <th align='left' style='vertical-align: bottom'>Start</th>
-    <th align='left' style='vertical-align: bottom'>End</th>
-    <th align='left' style='vertical-align: bottom'><div>Action<div></div>Duration</div></th>
-    <th align='left' style='vertical-align: bottom'>Dead Time</th>
-    <th/>
-    <th/>
-   </tr>
-   <tr ng-repeat="window in windows">
-    <!--td>{{window.id}}</td-->
-    <form name="windowForm" class="app-form" novalidate>
-    <td class='top' style='vertical-align: top'>
+-->
+ <h4>Time Windows</h4>
+ <table>
+  <tr>
+   <!--th>Id</th-->
+   <th>Description</th>
+   <th>Days</th>
+   <th>Start</th>
+   <th>End</th>
+   <th><div>Action<div></div>Duration</div></th>
+   <th>Dead Time</th>
+   <th/>
+   <th/>
+  </tr>
+  <tr ng-repeat="window in windows">
+   <!--td>{{window.id}}</td-->
+   <form name="windowForm" class="app-form" novalidate>
+    <td>
      <span ng-hide="window.edit">
       {{window.title}}
      </span>
@@ -48,7 +42,7 @@
       <input type="text" ng-model="editWindow.title" />
      </span>
     </td>
-    <td class='top' style='vertical-align: top'>
+    <td>
      <span ng-hide="window.edit">
       {{which_days(binary2logical(window.days))}}
      </span>
@@ -65,7 +59,7 @@
       </div>
      </span>
     </td>
-    <td class='top' style='vertical-align: top'>
+    <td>
      <span ng-hide="window.edit">
       {{ms2HHMM(window.start).join(':')}}
      </span>
@@ -74,7 +68,7 @@
       <select ng-model="editWindow.startMinute" ng-options="minute for minute in minutes"></select>
      </span>
     </td>
-    <td class='top' style='vertical-align: top'>
+    <td>
      <span ng-hide="window.edit">
       {{ms2HHMM(window.end).join(':')}}
      </span>
@@ -83,7 +77,7 @@
       <select ng-model="editWindow.endMinute" ng-options="minute for minute in minutes"></select>
      </span>
     </td>
-    <td class='top' style='vertical-align: top'>
+    <td>
      <span ng-hide="window.edit">
       {{displayDuration(window.duration).join(' ')}}
      </span>
@@ -106,7 +100,7 @@
       </div>
      </span>
     </td>
-    <td class='top' style='vertical-align: top'>
+    <td>
      <span ng-hide="window.edit">
       {{displayDeadTime(window.deadTime).join(' ')}}
      </span>
@@ -128,50 +122,38 @@
        </div>
      </span>
     </td>
-    <td class='top' style='vertical-align: top'>
+    <td>
      <button type="button" ng-click="editWindowInPlace($index)" ng-disabled="!window.editable">
       {{window.edit ? "Enter" : "Edit"}}
      </button>
     </td>
-    <td class='top' style='vertical-align: top'>
+    <td>
      <span ng-hide="window.confirmDelete">
       <button type="button" ng-click="confirmDeleteWindow($index, true)" ng-disabled="!window.editable || window.edit">X</button>
      </span>
-     <span ng-show="window.confirmDelete">
+     <span ng-show="window.confirmDelete" class="center">
       <div>
-       Please confirm that you wish to delete this entry
+       Delete entry 
       </div>
        <button type="button" ng-click="confirmDeleteWindow($index, false)">Cancel</button>
        <button type="button" ng-click="deleteWindow($index)">OK</button>
       </div>
      </span>
     </td>
-    </form>
-   </tr>
-   <tr>
-    <td/>
-    <td/>
-    <td/>
-    <td/>
-    <td/>
-    <td/>
-    <td>
-     <span ng-hide="editWindow.edit">
-      <button type="button" ng-click="addWindow()" ng-disabled="editWindow.edit">New</button>
-     </span>
-    </td>
-   <tr/>
-  </table>
- </div>
- <!-- In production use:
-  <script src='//ajax.googleapis.com/ajax/libs/angularjs/1.0.7/angular.min.js'></script>
-  -->
- <script src='lib/angular/angular.js'></script>
- <script src='lib/angular/angular-route.js'></script>
- <script src='js/app.js'></script>
- <script src='js/services.js'></script>
- <script src='js/controllers.js'></script>
- <script src='js/filters.js'></script>
- <script src='js/directives.js'></script>
-</body>
-</html>
+   </form>
+  </tr>
+  <tr>
+   <td/>
+   <td/>
+   <td/>
+   <td/>
+   <td/>
+   <td/>
+   <td>
+    <span ng-hide="editWindow.edit">
+     <button type="button" ng-click="addWindow()" ng-disabled="editWindow.edit">New</button>
+    </span>
+   </td>
+  <tr/>
+ </table>
+</div>
