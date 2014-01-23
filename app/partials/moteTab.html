@@ -11,35 +11,77 @@
   </tr>
   <tr ng-repeat="mote in motes">
    <!--td>{{mote.id}}</td-->
-   <td>{{mote.title}}</td>
-   <td>{{mote.device_id}}</td>
-   <td>{{mote.location}}</td>
-   <td>
-    <div ng-repeat="sensor in mote.sensors">
-     {{(measures | filter: {id: sensor.measure_id})[0].title}}
-    </div>
-   </td>
-   <td><button type="button" ng-click="deleteMote($index)">X</button></td>
+   <form name="newMoteForm" class="app-form" novalidate>
+    <td>
+     <span ng-hide="mote.edit">
+      {{mote.title}}
+     </span>
+     <span ng-show="mote.edit">
+      <ng-form name="$parent.moteForm1" class="app-form" novalidate>
+       <input type="text" name="moteTitle" ng-model="newMote.title" required />
+      </ng-form>
+     </span>
+    </td>
+    <td>
+     <span ng-hide="mote.edit">
+      {{mote.device_id}}
+     </span>
+     <span ng-show="mote.edit">
+      <ng-form name="$parent.moteForm2" class="app-form" novalidate>
+       <input type="text" name="moteDevice_id" ng-model="newMote.device_id" required />
+      </ng-form>
+     </span>
+    </td>
+    <td>
+     <span ng-hide="mote.edit">
+      {{mote.location}}
+     </span>
+     <span ng-show="mote.edit">
+      <ng-form name="$parent.moteForm3" class="app-form" novalidate>
+       <input type="text" name="moteLocation" ng-model="newMote.location"/>
+      </ng-form>
+     </span>
+    </td>
+    <td>
+     <span ng-hide="mote.edit">
+      <div ng-repeat="sensor in mote.sensors">
+       {{measureTitle(sensor.measure_id)}}
+      </div>
+     </span>
+     <span ng-show="mote.edit">
+      <div ng-repeat="measure in measures">
+       <input type="checkbox" ng-model="measure.selected" />{{measure.title}}
+      </div>
+     </span>
+    </td>
+    <td>
+     <button type="button" ng-click="editMote($index)" ng-disabled="! mote.editable">{{mote.edit ? 'Enter' : 'Edit'}}</button>
+    </td>
+    <td>
+     <span ng-hide="mote.confirmDelete">
+      <button type="button" ng-click="confirmDeleteMote($index, true)" ng-disabled="mote.edit || (! mote.editable)">X</button>
+     </span>
+     <span ng-show="mote.confirmDelete" class="center">
+      <div>
+       Delete entry
+      </div>
+      <div>
+       <button type="button" ng-click="confirmDeleteMote($index, false)" ng-disabled="mote.edit">Cancel</button>
+       <button type="button" ng-click="deleteMote($index)" ng-disabled="mote.edit">OK</button>
+      </div>
+     </span>
+    </td>
+   </form>
   </tr>
   <tr>
-   <form name="newMoteForm" class="app-form" novalidate>
-    <!--td>{{motes[motes.length - 1].id + 1}}</td-->
-    <td>
-     <span ng-show="newMoteForm.title.$dirty && newMoteForm.title.$error.required">Required: Please enter a title for the mote</span>
-     <input type="text" name="title" ng-model="newMote.title" required />
-    </td>
-    <td>
-     <span ng-show="newMoteForm.device_id.$dirty && newMoteForm.device_id.$error.required">Required: Please enter a device ID for the mote</span>
-     <input type="text" name="device_id" ng-model="newMote.device_id" required />
-    </td>
-    <td><input type="text" ng-model="newMote.location" /></td>
-    <td>
-     <div ng-repeat="measure in measures">
-      <input type="checkbox" ng-model="measure.selected" />{{measure.title}}
-     </div>
-    </td>
-    <td><button type="button" ng-click="addNewMote()">Add</button></td>
-   </form>
+   <td/>
+   <td/>
+   <td/>
+   <td/>
+   <td>
+    <span ng-hide="moteEdit">
+     <button type="button" ng-click="addNewMote()">Add</button></td>
+    </span>
   </tr>
  </table> 
 </div>

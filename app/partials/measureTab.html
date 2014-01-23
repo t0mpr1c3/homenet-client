@@ -11,28 +11,55 @@
    <th></th>
   </tr>
   <tr ng-repeat="measure in measures">
-   <!--td>{{measure.id}}</td-->
-   <td>{{measure.title}}</td>
-   <td>{{measure.unit}}</td>
-   <!--td>{{measure.hysteresis}}</td-->
-   <!--td><input type="checkbox" ng-model="measure.display" /></td-->
-   <td><button type="button" ng-click="deleteMeasure($index)">X</button></td>
-  </tr>
-  <tr>
-   <form name="newMeasureForm" class="app-form" novalidate>
+   <form name="newMeasureForm" class="app-form" novalidatedd>
     <!--td>{{measures[measures.length - 1].id + 1}}</td-->
     <td>
-     <span ng-show="newMeasureForm.title.$dirty && newMeasureForm.title.$error.required">Required: Please enter a title for the measure</span>
-     <input type="text" ng-model="newMeasure.title" required />
+     <span ng-hide="measure.edit">
+      {{measure.title}}
+     </span>
+     <span ng-show="measure.edit">
+      <ng-form name="$parent.measureForm1" class="appForm" novalidate>
+       <input type="text" name="measureTitle" ng-model="newMeasure.title" required />
+      </ng-form>
+     </span>
     </td>
     <td>
-     <span ng-show="newMeasureForm.unit.$dirty && newMeasureForm.unit.$error.required">Required: Please enter a unit for the measure</span>
-     <input type="text" ng-model="newMeasure.unit" required />
+     <span ng-hide="measure.edit">
+      {{measure.unit}}
+     </span>
+     <span ng-show="measure.edit">
+      <ng-form name="$parent.measureForm2" class="appForm" novalidate>
+       <input type="text" name="measureUnit" ng-model="newMeasure.unit" required />
+      </ng-form>
+     </span>
     </td>
     <!--td><input type="text" ng-model="newMeasure.hysteresis" /></td-->
     <!--td><input type="checkbox" ng-model="newMeasure.display" /></td-->
-    <td><button type="button" ng-click="addNewMeasure()">Add</button></td>
+    <td>
+     <button type="button" ng-click="editMeasure($index)" ng-disabled="! measure.editable">{{measure.edit ? 'Enter' : 'Edit'}}</button>
+    </td>
+    <td>
+     <span ng-hide="measure.confirmDelete">
+      <button type="button" ng-click="confirmDeleteMeasure($index, true)" ng-disabled="measure.edit || (! measure.editable)">X</button>
+     </span>
+     <span ng-show="measure.confirmDelete" class="center">
+      <div>Delete entry</div>
+      <div>
+       <button type="button" ng-click="confirmDeleteMeasure($index, false)" ng-disabled="mote.edit">Cancel</button>
+       <button type="button" ng-click="deleteMeasure($index)" ng-disabled="mote.edit">OK</button>
+      </div>
+     </span>
+    </td>
    </form>
+  </tr>
+  <tr>
+   <td/>
+   <td/>
+   <td>
+    <span ng-hide="measureEdit">
+     <button type="button" ng-click="addNewMeasure()">Add</button>
+    </span>
+   </td>
   </tr>
  </table>
 </div>

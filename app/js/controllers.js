@@ -25,8 +25,8 @@ angular.module('myApp.controllers', []).
     });
   }]).
 
-  controller('ApplianceTabCtrl', ['$scope', '$http', 'APIGetService', 'APIPostService',
-  'APIPutService', 'APIDeleteService', function($scope, $http,
+  controller('ApplianceTabCtrl', ['$scope', 'APIGetService', 'APIPostService',
+  'APIPutService', 'APIDeleteService', function($scope, 
   APIGetService, APIPostService, APIPutService, APIDeleteService) {
     // get appliances
     $scope.appliances = [];
@@ -79,7 +79,7 @@ angular.module('myApp.controllers', []).
         }
       }
       $scope.appliances[index].edit ^= true;
-      $scope.edit = $scope.appliances[index].edit;
+      $scope.applianceEdit = $scope.appliances[index].edit;
       if ($scope.appliances[index].edit)
       {
         $scope.newAppliance = {
@@ -135,7 +135,7 @@ angular.module('myApp.controllers', []).
         });
     }
     $scope.confirmDeleteAppliance = function(index, val) {
-      $scope.edit = val;
+      $scope.applianceEdit = val;
       for (var i = 0; i < $scope.appliances.length; i++) {
         $scope.appliances[i].editable = ! val;
       }
@@ -149,13 +149,18 @@ angular.module('myApp.controllers', []).
     }
   }]).
 
-  controller('MoteTabCtrl', ['$scope', '$http', 'APIGetService', 'APIPostService',
-  'APIPutService', 'APIDeleteService', function($scope, $http, APIGetService,
+  controller('MoteTabCtrl', ['$scope', 'APIGetService', 'APIPostService',
+  'APIPutService', 'APIDeleteService', function($scope, APIGetService,
   APIPostService, APIPutService, APIDeleteService) {
     // get motes
     $scope.motes = [];
     APIGetService('motes').then(function(data) {
       $scope.motes = data;
+      for (var i = 0; i < $scope.motes.length; i++) {
+        $scope.motes[i].edit = false;
+        $scope.motes[i].editable = true;
+        $scope.motes[i].confirmDelete = false;
+      }
     });
     $scope.newMote = {};
     // get measures
@@ -166,24 +171,32 @@ angular.module('myApp.controllers', []).
         $scope.measures[i].selected = false;
       }
     });
+    $scope.measureTitle = function(id) {
+      for (var i = 0; i < $scope.measures.length; i++) {
+        if ($scope.measures[i].id === id) {
+          return $scope.measures[i].title;
+        }
+      }
+    }
     // ng-click subroutines
+    $scope.confirmDeleteMote = function(index, val) {
+      $scope.moteEdit = val;
+      for (var i = 0; i < $scope.motes.length; i++) {
+        $scope.motes[i].editable = ! val;
+      }
+      $scope.motes[index].confirmDelete = val;
+    }
     $scope.deleteMote = function(index) {
       APIDeleteService('motes/' + $scope.motes[index].id).then(function() {
+        $scope.confirmDeleteMote(index, false);
         $scope.motes.splice(index, 1);
       });
     }
     $scope.addNewMote = function() {
+      $scope.newMote = {
+        'id': $scope.motes[$scope.motes.length - 1].id + 1
+      };
       $scope.newMote.sensors = [];
-      for (var i = 0; i < $scope.measures.length; i++) {
-        if ($scope.measures[i].selected) {
-          $scope.newMote.sensors.push({
-            "measure_id": $scope.measures[i].id, 
-            "value": "----", 
-            "timestamp": ""
-          });
-        }
-      }
-      $scope.newMote.id = $scope.motes[$scope.motes.length - 1].id + 1; 
       APIPostService('motes', $scope.newMote).
         then(function() {
           $scope.motes.push($scope.newMote);
@@ -191,41 +204,157 @@ angular.module('myApp.controllers', []).
           for (var i = 0; i < $scope.measures.length; i++) {
             $scope.measures[i].selected = false;
           }
+          $scope.motes[$scope.motes.length - 1].editable = true;
+          $scope.editMote($scope.motes.length - 1);
         });
     }
-/*
-    $scope.editMoteSensors(index, $scope.newSensors) {
-      APIPutService('motes/' + $scope.motes[index].id, $scope.newSensors).
-        then(function() {
-          $scope.motes[index].sensors = $scope.newSensors;
+    $scope.editMote = function(index) {
+      // prevents input errors
+      // setting forms dirty aims to highlight entry errors via css
+      var invalid = false;
+      if ($scope.motes[index].edit && $scope.moteForm1.moteTitle.$invalid) { 
+        $scope.moteForm1.$dirty = true;
+        $scope.moteForm1.moteTitle.$dirty = true;
+        invalid = true;
+      }
+      if ($scope.motes[index].edit && $scope.moteForm2.moteDevice_id.$invalid) { 
+        $scope.moteForm2.$dirty = true;
+        $scope.moteForm2.moteDevice_id.$dirty = true;
+        invalid = true;
+      }
+      if (invalid) {
+        return;
+      }
+      // toggle edit status and button disable
+      for (var i = 0; i < $scope.motes.length; i++) {
+        if ( i !== index ) {
+          $scope.motes[i].editable ^= true;
+        }
+      }
+      $scope.motes[index].edit ^= true;
+      $scope.moteEdit = $scope.motes[index].edit;
+      if ($scope.motes[index].edit)
+      {
+        $scope.newMote = {
+          'id': $scope.motes[index].id,
+          'title': $scope.motes[index].title,
+          'device_id': $scope.motes[index].device_id,
+          'location': $scope.motes[index].location,
+          'sensors': []
+        };
+        for (var i = 0; i < $scope.motes[index].sensors.length; i++) {
+          for (var j = 0; j < $scope.measures.length; j++) {
+            if ($scope.motes[index].sensors[i].measure_id === $scope.measures[j].id) {
+              $scope.measures[j].selected = true;
+            }
+          }
+        }
+      } else {
+        for (var i = 0; i < $scope.measures.length; i++) {
+          if ($scope.measures[i].selected) {
+            $scope.newMote.sensors.push({
+              'measure_id': $scope.measures[i].id,
+              'value': '',
+              'timestamp': ''
+            });
+            $scope.measures[i].selected = false;
+          }
+        }
+        APIPutService('motes/' + $scope.motes[index].id, $scope.newMote).
+          then(function() {
+            $scope.motes[index].title = $scope.newMote.title;
+            $scope.motes[index].device_id = $scope.newMote.device_id;
+            $scope.motes[index].location = $scope.newMote.location;
+            $scope.motes[index].sensors = $scope.newMote.sensors;
+            $scope.moteForm1.moteTitle.$dirty = false;
+            $scope.moteForm2.moteDevice_id.$dirty = false;
         });
+      }
     }
-*/
   }]).
 
-  controller('MeasureTabCtrl', ['$scope', 'APIGetService', 'APIPostService', 
-  'APIDeleteService', function($scope, APIGetService, APIPostService, APIDeleteService) {
+  controller('MeasureTabCtrl', ['$scope', 'APIGetService', 'APIPutService', 
+  'APIPostService', 'APIDeleteService', function($scope, APIGetService, APIPutService,
+  APIPostService, APIDeleteService) {
     // get measures
     $scope.measures = [];
     APIGetService('measures').then(function(data) {
       $scope.measures = data;
+      for (var i = 0; i < $scope.measures.length; i++) {
+        $scope.measures[i].edit = false;
+        $scope.measures[i].editable = true;
+        $scope.measures[i].confirmDelete = false;
+      }
     });
     $scope.newMeasure = {};
     // ng-click subroutines
+    $scope.confirmDeleteMeasure = function(index, val) {
+      $scope.measureEdit = val;
+      for (var i = 0; i < $scope.measures.length; i++) {
+        $scope.measures[i].editable = ! val;
+      }
+      $scope.measures[index].confirmDelete = val;
+    }
     $scope.deleteMeasure = function(index) {
       APIDeleteService('measures/' + $scope.measures[index].id).then(function() {
+        $scope.confirmDeleteMeasure(index, false);
         $scope.measures.splice(index, 1);
       });
     }
     $scope.addNewMeasure = function() {
-      // FIXME check input values
-      // FIXME insert default hysteresis/display value
-      $scope.newMeasure.id = $scope.measures[$scope.measures.length - 1].id + 1; 
+      $scope.newMeasure = {
+        'id': $scope.measures[$scope.measures.length - 1].id + 1
+      };
       APIPostService('measures', $scope.newMeasure).
         then(function() {
           $scope.measures.push($scope.newMeasure);
           $scope.newMeasure = {};
+          $scope.measures[$scope.measures.length - 1].editable = true;
+          $scope.editMeasure($scope.measures.length - 1);
         });
+    }
+    $scope.editMeasure = function(index) {
+      // prevents input errors
+      // setting forms dirty aims to highlight entry errors via css
+      var invalid = false;
+      if ($scope.measures[index].edit && $scope.measureForm1.measureTitle.$invalid) { 
+        $scope.measureForm1.$dirty = true;
+        $scope.measureForm1.measureTitle.$dirty = true;
+        invalid = true;
+      }
+      if ($scope.measures[index].edit && $scope.measureForm2.measureUnit.$invalid) { 
+        $scope.measureForm2.$dirty = true;
+        $scope.measureForm2.measureUnit.$dirty = true;
+        invalid = true;
+      }
+      if (invalid) {
+        return;
+      }
+      // toggle edit status and button disable
+      for (var i = 0; i < $scope.measures.length; i++) {
+        if ( i !== index ) {
+          $scope.measures[i].editable ^= true;
+        }
+      }
+      $scope.measures[index].edit ^= true;
+      $scope.measureEdit = $scope.measures[index].edit;
+      if ($scope.measures[index].edit)
+      {
+        $scope.newMeasure = {
+          'id': $scope.measures[index].id,
+          'title': $scope.measures[index].title,
+          'unit': $scope.measures[index].unit
+        };
+      } else {
+        APIPutService('measures/' + $scope.measures[index].id, $scope.newMeasure).
+          then(function() {
+            $scope.measures[index].id = $scope.newMeasure.id;
+            $scope.measures[index].title = $scope.newMeasure.title;
+            $scope.measures[index].unit = $scope.newMeasure.unit;
+            $scope.measureForm1.measureTitle.$dirty = false;
+            $scope.measureForm2.measureUnit.$dirty = false;
+        });
+      }
     }
   }]).
 
